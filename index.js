@@ -18,9 +18,24 @@ async function run() {
     try {
         await client.connect()
         const billingCollection = client.db('power-hack').collection('billings')
+        const userCollection = client.db('power-hack').collection('users')
+
+
         app.get('/billing-list', async (req, res) => {
             const query = {}
-            const users = await billingCollection.find(query).toArray()
+            const billings = await billingCollection.find(query).toArray()
+            res.send(billings)
+        })
+
+
+        app.post('/registration', async (req, res) => {
+            const user = req.body
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+        })
+        app.get('/login', async (req, res) => {
+            const query = {}
+            const users = await userCollection.find(query).toArray()
             res.send(users)
         })
     }

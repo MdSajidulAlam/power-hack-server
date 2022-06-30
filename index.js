@@ -3,6 +3,7 @@ const app = express()
 require('dotenv').config()
 const port = process.env.PORT || 5000
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 app.use(cors())
@@ -19,6 +20,14 @@ async function run() {
         await client.connect()
         const billingCollection = client.db('power-hack').collection('billings')
         const userCollection = client.db('power-hack').collection('users')
+
+        app.post('/login', async (req, res) => {
+            const user = req.body
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1h'
+            })
+            res.send({ accessToken })
+        })
 
 
         app.get('/billing-list', async (req, res) => {
@@ -37,6 +46,12 @@ async function run() {
             const query = {}
             const users = await userCollection.find(query).toArray()
             res.send(users)
+        })
+        app.post('/add-billing', async (req, res) => {
+            const billing = req.body
+            const result = await billingCollection.insertOne(billing)
+            res.send(result)
+
         })
     }
     finally {

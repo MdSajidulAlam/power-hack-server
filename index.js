@@ -53,6 +53,23 @@ async function run() {
             res.send(result)
 
         })
+
+        app.patch('/update-bill/:id', async (req, res) => {
+            const id = req.params.id
+            const updatedBill = req.body
+            const filter = { _id: ObjectId(id) }
+            const updateDoc = {
+                $set: {
+                    name: updatedBill.name,
+                    email: updatedBill.email,
+                    phone: updatedBill.phone,
+                    paidAmount: updatedBill.paidAmount,
+                }
+            }
+            const result = await billingCollection.updateOne(filter, updateDoc)
+            res.send(result)
+        })
+
         app.delete('/delete-bill/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
